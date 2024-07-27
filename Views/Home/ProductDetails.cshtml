@@ -1,0 +1,241 @@
+﻿@model ProductsDetails
+@{
+	ViewData["Title"] = "Products Details";
+}
+<div class="container">
+	<div class="row">
+		<div class="col text-center mt-1">
+			<h1 class="display-4 "><span class="badge bg-light bordred text-dark"> تفاصيل المنتجات</span> </h1>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col">
+			<button class="btn btn-primary" onclick="AddNewItemsDetails()"> <i class="fs-4 bi-cart-plus p-2"></i> أضافة
+				تفاصيل للمنتج </button>
+		</div>
+	</div>
+</div>
+
+
+<div class="row mt-4 text-center" dir="rtl">
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<table class="table table-bordered text-center">
+					<thead>
+						<tr class="bg-primary text-white">
+							<th>#</th>
+							<th>اسم المنتج</th>
+							<th>لون المنتج</th>
+							<th>سعر المنتج</th>
+							<th>كمية المنتج</th>
+							<th>صورة المنتج</th>
+							<th colspan="2">الإجراء</th>
+
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in ViewBag.ProductDetails)
+						{
+							<tr>
+								<td>@item.id</td>
+								<td>@item.name</td>
+								<td>@item.color</td>
+								<td>@item.price </td>
+								<td>@item.qty </td>
+								<td><img src="~/images/@item.image"  height="340" width="auto" /> </td>
+								<td><a onclick="ShowDelMessage(@item.id)"> <i class="bi bi-archive-fill text-danger"></i></a></td>
+								<td><a onclick="EditItemDetails(@item.id)"><i
+											class="bi bi-pencil-fill text-success"></i></a></td>
+
+							</tr>
+						}
+
+					</tbody>
+				</table>
+
+				   <div class="row">
+                    <div class="col">
+                        @if (TempData["del"] != null)
+                        {
+                            if (@TempData["del"].ToString() == "True")
+                            {
+                                <h2 class="alert alert-success text-center text-danger">تم الحذف</h2>
+                            }
+                            else
+                            {
+                                <h2 class="alert alert-danger text-center">لم يتم الحذف</h2>
+                            }
+
+                        }
+                        else if (TempData["upd"] != null)
+                        {
+                            if (@TempData["upd"].ToString() == "True")
+                            {
+                                <h2 class="alert alert-success text-center">تم التعديل</h2>
+                            }
+                            else
+                            {
+                                <h2 class="alert alert-danger text-center">لم يتم التعديل</h2>
+                            }
+                        }
+
+                    </div>
+                </div>
+                
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal" tabindex="-1" id="newproductsDetails">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<h5 class="modal-title"> إضافة تفاصيل للمنتج </h5>
+			</div>
+			<div class="modal-body">
+				<form asp-action="CreateDetails" method="post" enctype="multipart/form-data" style="direction:rtl;">
+					<div class="row">
+						<div class="col-sm-4">
+							<label class="form-label">اختر المنتج</label>
+							<select class="form-control" id="p" asp-for="ProductId">
+								@foreach (var item in ViewBag.Products)
+								{
+									<option value="@item.Id">@item.Name</option>
+								}
+							</select>
+						</div>
+						<div class="col-sm-4">
+							<label class="form-label">صورة المنتج</label>
+							<input type="file" class="form-control img-fluid" name="photo" />
+						</div>
+						<div class="col-sm-4">
+							<label class="form-label">سعر المنتج</label>
+							<input type="text" class="form-control" asp-for="Price" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-6">
+							<label class="form-label">الكمية</label>
+							<input type="text" class="form-control" asp-for="Qty" />
+						</div>
+						<div class="col-sm-6">
+							<label class="form-label">لون المنتج</label>
+							<input type="text" class="form-control" asp-for="Color" />
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء الأمر </button>
+						<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">حفظ</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal" tabindex="-1" id="editproductsDetails">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<h5 class="modal-title"> تعديل المنتج </h5>
+			</div>
+			<div class="modal-body">
+				<form asp-action="UpdateDetails" method="post" enctype="multipart/form-data" style="direction:rtl">
+					<div class="row mb-4">
+						<input type="hidden" name="id" id="id" asp-for="Id" />
+						<input type="hidden" id="ProductId" asp-for="ProductId" />
+						<div class="col-sm-12">
+							<img id="imgPreview" alt="Product Image" class="img-fluid" height="240" width="240" />
+						</div>
+						<div class="col-sm-6">
+							<label for="img" class="form-label">صورة المنتج</label>
+							<input type="file" id="photo" name="photo" class="form-control" />
+						</div>
+						<div class="col-sm-6">
+							<label for="price" class="form-label">سعر المنتج</label>
+							<input type="number" id="price" asp-for="Price" class="form-control" />
+						</div>
+						<div class="col-sm-6">
+							<label for="qty" class="form-label">عدد المنتج</label>
+							<input type="number" id="qty" asp-for="Qty" class="form-control" />
+						</div>
+						<div class="col-sm-6">
+							<label for="color" class="form-label">لون المنتج</label>
+							<input type="text" id="color" asp-for="Color" class="form-control" />
+						</div>
+					</div>
+					<div class="modal-footer d-flex justify-content-start">
+						<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">تعديل</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء الأمر </button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal" tabindex="-1" id="deleteproductsDetails">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">تاكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل ترغب بتأكيد الحذف</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="CnfirmDel()">تأكيد</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+	function AddNewItemsDetails() {
+		$("#newproductsDetails").modal("show");
+	}
+	function EditItemDetails(id) {
+
+		$.ajax({
+			type: "POST",
+			url: "/Home/GetDetails",
+			data: { id: id },
+			success: function (result) {
+				document.getElementById("id").value = result.id;
+				document.getElementById("price").value = result.price;
+				document.getElementById("qty").value = result.qty;
+				document.getElementById("color").value = result.color;
+
+				var imagePath = "/images/" + result.images;
+				document.getElementById("imgPreview").src = imagePath;
+			},
+			error: function (xhr, status, error) {
+				console.error('AJAX Error: ' + error);
+			}
+		});
+		$("#editproductsDetails").modal('show');
+
+	}
+
+    function ShowDelMessage(id) {
+        gid = id;
+        $("#deleteproductsDetails").modal('show');
+    }
+
+    function CnfirmDel() {
+        $.ajax({
+            type: "POST",
+            url: "/Home/DeleteDetails",
+            data: { record_no: gid },
+            success: function (result) {
+                window.location.href = "/Home/ProductDetails"
+            }
+        });
+    }
+</script>

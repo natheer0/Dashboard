@@ -1,0 +1,60 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+
+<div class="card mt-5" dir="rtl">
+    <div class="card-body bg-light">
+        <div class="row">
+            <div class="col-md-12">
+                <section>
+                    <form id="account" method="post">
+                        <h2 class="text-center fw-bold">تسجيل الدخول</h2>
+                        <hr />
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div class="form-floating mb-3">
+                            <label asp-for="Input.Email" class="form-label">الإيميل</label>
+
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <label asp-for="Input.Password" class="form-label">كلمة المرور</label>
+                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        <div class="checkbox mb-3">
+                            <label asp-for="Input.RememberMe" class="form-label">
+                                <input class="form-check-input" asp-for="Input.RememberMe" />
+                                @Html.DisplayNameFor(m => m.Input.RememberMe)
+                            </label>
+                        </div>
+                        <div>
+                            <button id="login-submit" type="submit" class="w-100 btn btn-lg text-white" style="background-color: #232557;">دخول</button>
+                        </div>
+                        <div class="text-center my-4">
+                            <p>
+                                <a id="forgot-password" class="btn btn-link" asp-page="./ForgotPassword">هل نسيت كلمة المرور؟</a>
+                            </p>
+                            <p>
+                                <a class="btn btn-primary" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">التسجيل</a>
+                            </p>
+                            <p>
+                                <a id="resend-confirmation" class="btn btn-secondary" asp-page="./ResendEmailConfirmation">إعادة ارسال تأكيد الإيميل</a>
+                            </p>
+                        </div>
+
+                    </form>
+                </section>
+            </div>
+
+        </div>
+
+</div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

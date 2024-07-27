@@ -1,0 +1,208 @@
+﻿@model IEnumerable<Products>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col text-center mt-2">
+            <h1 class="display-4 "><span class="badge bg-light bordred text-dark"> قائمة المنتجات</span> </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-success" onclick="AddNewItems()">  <i class="fs-4 bi-cart-plus p-2"></i> أضافة منتج </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card mt-5">
+            <div class="card-body">
+                <table class="table table-bordered text-center" dir="rtl">
+                    <thead class="bg-success text-white">
+                        <tr>
+                            <th>رقم المنتج</th>
+                            <th>اسم المنتج</th>
+                            <th>وصف المنتج</th>
+                            <th colspan="2">الإجراء </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var items in Model)
+                        {
+                            <tr>
+                                <td>@items.Id</td>
+                                <td>@items.Name</td>
+                                <td>@items.Description</td>
+                                <td>
+                                    <a onclick="ShowDelMessage(@items.Id)">
+                                        <i class="bi bi-archive-fill text-danger"></i>
+                                <td><a onclick="EditItems(@items.Id)"><i class="bi bi-pencil-fill text-success"></i></a></td>
+
+                                    </a>
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col">
+                        @if (TempData["del"] != null)
+                        {
+                            if (@TempData["del"].ToString() == "True")
+                            {
+                                <h2 class="alert alert-success text-center text-danger">تم الحذف</h2>
+                            }
+                            else
+                            {
+                                <h2 class="alert alert-danger text-center">لم يتم الحذف</h2>
+                            }
+
+                        }
+                        else if (TempData["upd"] != null)
+                        {
+                            if (@TempData["upd"].ToString() == "True")
+                            {
+                                <h2 class="alert alert-success text-center">تم التعديل</h2>
+                            }
+                            else
+                            {
+                                <h2 class="alert alert-danger text-center">لم يتم التعديل</h2>
+                            }
+                        }
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal" tabindex="-1" id="newproducts">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"> إضافة منتج جديد </h5>
+            </div>
+            <div class="modal-body">
+                <form asp-action="CreateProducts" method="post">
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label" for="">اسم المنتج</label>
+                            <input type="text" id="newitem" asp-for="@Model.FirstOrDefault().Name" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="">وصف المنتج </label>
+                            <input type="text" id="description" asp-for="@Model.FirstOrDefault().Description" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء الأمر </button>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">حفظ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="editproducts">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"> تعديل المنتج </h5>
+            </div>
+            <div class="modal-body">
+                <form asp-action="UpdateProducts" method="post">
+                    <div>
+                        <div class="row">
+                            <input type="hidden" id="Id" name="Id" />
+
+                            <div class="col">
+                                <label class="form-label" for="">اسم المنتج</label>
+                                <input type="text" id="editname" asp-for="@Model.FirstOrDefault().Name" class="form-control form-control-sm" />
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="">وصف المنتج </label>
+                                <input type="text" id="editdescription" asp-for="@Model.FirstOrDefault().Description" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء الأمر </button>
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">حفظ</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="deleteproducts">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">تاكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل ترغب بتأكيد الحذف</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="CnfirmDel()">تأكيد</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function AddNewItems() {
+        $("#newproducts").modal("show");
+    }
+
+    function EditItems(id) {
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/GetData",
+            data: { id: id },
+            success: function (result) {
+
+                document.getElementById("Id").value = result.id;
+                document.getElementById("editname").value = result.name;
+                document.getElementById("editdescription").value = result.description;
+
+
+                $("#editproducts").modal('show');
+            }
+        });
+    }
+
+    function ShowDelMessage(id) {
+        gid = id;
+        $("#deleteproducts").modal('show');
+    }
+
+    function CnfirmDel() {
+        $.ajax({
+            type: "POST",
+            url: "/Home/DeleteItem",
+            data: { record_no: gid },
+            success: function (result) {
+                window.location.href = "/Home/AddNewItems"
+            }
+        });
+    }
+</script>
